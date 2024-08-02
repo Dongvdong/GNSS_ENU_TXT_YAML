@@ -44,20 +44,21 @@ public:
 public:
    // 初始化 赋予原始数据
    gnss_data(double time_,double lat_,double lon_,double high_):time(time_), lat(lat_),lon(lon_),high(high_) {}
-   bool Set_Gnss(double time_,double lat_,double lon_,double high_){
+   
+   void Set_Gnss(double time_,double lat_,double lon_,double high_){
         time=time_;
         lat=lat_;
         lon=lon_;
         high=high_;
    };
  
-   bool Set_orinGnss(double lat0_,double lon0_,double high0_){
+   void Set_orinGnss(double lat0_,double lon0_,double high0_){
      lat0=lat0_;
      lon0=lon0_;
      high0=high0_;
    }
  
-   bool Set_ENU(double x_,double y_,double z_){
+   void Set_ENU(double x_,double y_,double z_){
      x=x_;
      y=y_;
      z=z_;
@@ -134,25 +135,28 @@ public:
 };
 
 
-int Get_GNSS_INTI_YAML(std::string read_path,gnss_data &gnss_data_int0) {
+int Get_GNSS_INTI_YAML( std::string read_path,gnss_data &gnss_data_int0) {
     try {
         // 读取YAML文件
         YAML::Node config = YAML::LoadFile(read_path);
+        //std::cout << "读取gnss 初始点位置" << std::endl;
  
         // 访问YAML中的数据
         std::string lat0 = config["Initial.lat"].as<std::string>();
         std::string lon0 = config["Initial.lon"].as<std::string>();
         std::string alt0 = config["Initial.alt"].as<std::string>();
         double time0=0.0;
-        
-        gnss_data_int0.Set_Gnss(time0,stod(lat0),stod(lon0),stod(alt0));
 
-        // // 打印读取的数据
-        std::cout << "函数内部" << std::endl;
+               // // 打印读取的数据
+        
         //std::cout  << fixed << setprecision(10)<< endl;
-        std::cout << "原点 纬度: " << lat0 << std::endl;
-        std::cout << "原点 经度: " << lon0 << std::endl;
-        std::cout << "原点 高度: " << alt0 << std::endl;
+        // std::cout << "原点 纬度: " << lat0 << std::endl;
+        // std::cout << "原点 经度: " << lon0 << std::endl;
+        // std::cout << "原点 高度: " << alt0 << std::endl;
+
+        gnss_data_int0.Set_Gnss(time0,stod(lat0),stod(lon0),stod(alt0));
+        std::cout << "GNSS原始点加载完毕" << std::endl;
+
     } catch (const YAML::Exception& e) {
         std::cerr << "YAML Exception: " << e.what() << std::endl;
         return 1;
@@ -162,6 +166,37 @@ int Get_GNSS_INTI_YAML(std::string read_path,gnss_data &gnss_data_int0) {
 }
  
 
+
+std::string  Get_YAML(std::string read_path,char *name) {
+    try {
+        // 读取YAML文件
+        YAML::Node config = YAML::LoadFile(read_path);
+ 
+        // 访问YAML中的数据
+        std::string name_value = config[name].as<std::string>();
+       
+        std::cout << "yaml 读取数据： "<<name <<" " <<  name_value << std::endl;
+        return name_value;
+
+    } catch (const YAML::Exception& e) {
+        std::cerr << "YAML Exception: " << e.what() << std::endl;
+        return "error";
+    }
+ 
+    return 0;
+}
+ 
+ 
+// 函数用于按照指定分隔符分割字符串
+std::vector<std::string> splitString(const std::string &s, char delim) {
+    std::vector<std::string> tokens;
+    std::stringstream ss(s);
+    std::string token;
+    while (std::getline(ss, token, delim)) {
+        tokens.push_back(token);
+    }
+    return tokens;
+}
 
  
 // int main() {
